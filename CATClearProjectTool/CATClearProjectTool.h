@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#define weakSelf(type) __weak __typeof__(type) weakSelf = type;
+#define strongSelf(type) __strong __typeof__(type) strongSelf = type; if (nil == strongSelf) return;
 
 @protocol CATClearProjectToolDelegate <NSObject>
 

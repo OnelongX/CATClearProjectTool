@@ -69,7 +69,6 @@
         NSError* error = [NSError errorWithDomain:@"please input correct xcodeproj path!" code:-1 userInfo:nil];
         NSAlert* alert = [NSAlert alertWithError:error];
         [alert beginSheetModalForWindow:[NSApplication sharedApplication].keyWindow completionHandler:nil];
-        
         if (_delegate && [_delegate respondsToSelector:@selector(searchAllClassesError:)]) {
             [_delegate searchAllClassesError:error];
         }
@@ -95,7 +94,11 @@
         [self _searchAllClassesWithDir:_projectDir mainGroupDic:mainGroupDic uuid:mainGroupUuid];
         
         if (_delegate && [_delegate respondsToSelector:@selector(searchAllClassesSuccess:)]) {
-            [_delegate searchAllClassesSuccess:_allClasses];
+            weakSelf(self)
+            dispatch_async(dispatch_get_main_queue(), ^{
+                strongSelf(weakSelf)
+                [strongSelf->_delegate searchAllClassesSuccess:strongSelf->_allClasses];
+            });
         }
         
         //5.start search used classes
@@ -108,7 +111,12 @@
         }
         
         if (_delegate && [_delegate respondsToSelector:@selector(searchUnUsedClassesSuccess:)]) {
-            [_delegate searchUnUsedClassesSuccess:_unUsedClasses];
+            weakSelf(self)
+            dispatch_async(dispatch_get_main_queue(), ^{
+                strongSelf(weakSelf)
+                [_delegate searchUnUsedClassesSuccess:_unUsedClasses];
+            });
+            
         }
     });
 }
@@ -165,9 +173,11 @@
             });
             
         }else{
+            weakSelf(self)
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (_delegate && [_delegate respondsToSelector:@selector(clearUnUsedClassesSuccess:)]) {
-                    [_delegate clearUnUsedClassesSuccess:_unUsedClasses];
+                    strongSelf(weakSelf)
+                    [strongSelf->_delegate clearUnUsedClassesSuccess:strongSelf->_unUsedClasses];
                 }
             });
         }
